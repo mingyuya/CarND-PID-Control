@@ -1,3 +1,5 @@
+#include <vector>
+
 #ifndef PID_H
 #define PID_H
 
@@ -16,6 +18,17 @@ public:
   double Kp;
   double Ki;
   double Kd;
+
+  /*
+  * For Twiddle
+  */
+  std::vector<double> p;
+  std::vector<double> dp;
+
+  bool init_done;
+  int p_idx;
+  int runs;
+  double best_err, error;
 
   /*
   * Constructor
@@ -41,6 +54,11 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+  /*
+  * Twiddle for optimizing parameters
+  */
+  void Twiddle(double cte, double tolerance, int n);
 };
 
 #endif /* PID_H */
