@@ -1,5 +1,6 @@
 #include "PID.h"
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 using namespace std;
@@ -18,9 +19,11 @@ void PID::Init(double Kp_i, double Ki_i, double Kd_i) {
   d_error = 0.;
 
   p = {0.0, 0.0, 0.0};
-  dp = {1.0, 1.0, 1.0};
+  //dp = {1.0, 1.0, 1.0};
+  dp = {Kp_i*0.1, Ki_i*0.1, Kd_i*0.1};
 
   init_done = false;
+  opt_done = false;
   p_idx = 0;
   runs = 0;
   best_err = 0.0;
@@ -44,7 +47,8 @@ void PID::Twiddle(double cte, double tolerance, int n) {
   p = {Kp, Ki, Kd};
 
   if ( init_done == false ) {
-    dp = {1.0, 1.0, 1.0};
+    dp = {Kp*0.1, Ki*0.1, Kd*0.1};
+    dp = {Kp*0.2, Ki*0.2, Kd*0.2};
     error += cte;
     runs++;
     if ( runs == n ) {  // Init.
@@ -52,22 +56,19 @@ void PID::Twiddle(double cte, double tolerance, int n) {
       error = 0.0;
       best_err = error/n;
       init_done = true;
+      // Debug
+      cout << ">> Initialization is done." << endl;
     }
     return;
   }
   else {
-    if ( (dp[0]+dp[1]+dp[2]) > tolerance ) {
+    if ( (fabs(dp[0])+fabs(dp[1])+fabs(dp[2])) > tolerance ) {
       double current_err;
       if (runs == 0) {
         p[p_idx] += dp[p_idx];
         Kp = p[0];
         Ki = p[1];
         Kd = p[2];
-        runs++;
-        return;
-      }
-      else if (runs < n) {
-        error += cte;
         runs++;
         return;
       }
@@ -112,15 +113,22 @@ void PID::Twiddle(double cte, double tolerance, int n) {
       }
       else {  // (abs(dp[0])+abs(dp[1])+abs(dp[2]) <= tolerance 
         runs++;
-        error += cte;
+        //error += cte;
+        error += cte*cte;
       }
     }
     else {
-      cout << "Optimized Parameter : " << p[0] << p[1] << p[2] << endl;
+      //cout << "Optimized Parameter : " << "Kp = " << p[0] << "Ki = "<< p[1] << "Kd = " << p[2] << endl;
+      ofstream log;
+      log.open ("result_optimization.txt", ios::out | ios::app);
+      log << "Optimized Parameters : " << "Kp = " << p[0] << ", Ki = "<< p[1] << ", Kd = " << p[2] << " with best_err = " << best_err << endl;
+      log.close();
+
       init_done = false;
-      error = 0.0;
-      p_idx = 0;
-      runs = 0;
+      opt_done = true;
+      //error = 0.0;
+      //p_idx = 0;
+      //runs = 0;
     }
   }
 }

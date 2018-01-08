@@ -61,6 +61,8 @@ int main()
           pid.UpdateError(cte);
           pid.Twiddle(cte, 0.2, 100);
           steer_value = pid.TotalError();
+          if ((pid.init_done == false) && (pid.opt_done == true))
+            pid.Init(pid.Kp, pid.Ki, pid.Kd);
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;

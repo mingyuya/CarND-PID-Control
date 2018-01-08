@@ -25,7 +25,7 @@ public:
   std::vector<double> p;
   std::vector<double> dp;
 
-  bool init_done;
+  bool init_done, opt_done;
   int p_idx;
   int runs;
   double best_err, error;
