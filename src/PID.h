@@ -22,6 +22,7 @@ public:
   /*
   * For Twiddle
   */
+  bool twiddle_on;
   std::vector<double> p;
   std::vector<double> dp;
 
@@ -51,9 +52,14 @@ public:
   void UpdateError(double cte);
 
   /*
+  * Calculate the output of PID controller.
+  */
+  double CalcPIDOut();
+
+  /*
   * Calculate the total PID error.
   */
-  double TotalError();
+  bool TotalError(double cte, int times);
 
   /*
   * Twiddle for optimizing parameters

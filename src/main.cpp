@@ -28,15 +28,24 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main()
+int main(int argc, char **argv)
 {
   uWS::Hub h;
 
   PID pid;
-  
-  // Initialize the pid variable.
-  pid.Init(0.2, 0.004, 2.0);  
 
+  // Initialize the pid variable.
+  //pid.Init(0.2, 0.004, 3.0);  
+  pid.Init(0.118098, 0.00236196, 1.77147);  
+
+  if (argc > 1) {
+    std::string arg = argv[1];
+    if (arg == "opt") {
+      pid.twiddle_on = true;
+      std::cout << " >> Start optimizing parameters" << std::endl;
+    }
+  }
+  
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -53,24 +62,33 @@ int main()
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
+
           /*
           * Calculate steering value, [-1, 1].
-          * NOTE: Feel free to play around with the throttle and speed. Maybe use
-          * another PID controller to control the speed!
           */
           pid.UpdateError(cte);
-          pid.Twiddle(cte, 0.2, 100);
-          steer_value = pid.TotalError();
-          if ((pid.init_done == false) && (pid.opt_done == true))
-            pid.Init(pid.Kp, pid.Ki, pid.Kd);
+          if (pid.twiddle_on) pid.Twiddle(cte, 0.2, 80);
+          steer_value = pid.CalcPIDOut();
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.3;
-          //msgJson["throttle"] = -(0.3*pow(fabs(cte), 2)) + 0.4;
+          if (pid.twiddle_on) // Use constant throttle during optimization of PID
+            msgJson["throttle"] = 0.4;
+          else 
+            msgJson["throttle"] = -(0.08*pow(cte, 2)) + 0.4;
+          
+          /*
+          * To calculate the total error during single lap
+          */
+          /*
+          if (pid.TotalError(cte, 1200)) {
+            std::cout << "Total error is " << pid.error << std::endl;
+            while(1) {};
+          }
+          */
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
