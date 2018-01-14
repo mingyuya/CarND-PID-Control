@@ -14,7 +14,7 @@ The following is a block diagram of a PID controller
 
 ![alt_text][image1]
 
-More theoretical details can be found at the link.
+More theoretical details can be found at the link above.
 
 ## Implementation
 
