@@ -29,7 +29,7 @@ In this project, the goal is steering the car in the simulator safely by PID con
 
 ### 2. Parameter Optimization
 
-I used **Twiddle** algorithm for the optimization of parameters of PID controller. The explanation of the algorithm is provided at [the lecture from Udacity](https://www.youtube.com/watch?v=2uQ2BSzDvXs). The lecture gave me the code of twiddle in python like the following. I built another version of twiddle code in C++ in this project. It can be found in `PID.cpp`.  
+I used **Twiddle** algorithm for the optimization of parameters of PID controller. The explanation of the algorithm is provided at [the lecture in Udacity](https://www.youtube.com/watch?v=2uQ2BSzDvXs). The lecture gave me the code of twiddle in python like the following. I built another version of twiddle code in C++ in this project. It can be found in `PID.cpp`.  
 
 ```{.python}
 # Choose an initialization parameter vector
@@ -62,6 +62,8 @@ while sum(dp) > threshold:
                 # direction, the step size might simply be too big.
                 dp[i] *= 0.95
 ```
+
+I set the initial parameters as the values from the lecture mentioned above which are Kp = 0.2, Ki = 0.004, Kd = 3.0. The twiddle that I implemented tunned those values to Kp = 0.118098, Ki = 0.00236196, Kd = 1.77147. 
 
 ### 3. Adaptive throttle value
 
