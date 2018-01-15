@@ -23,13 +23,13 @@ In this project, the goal is steering the car in the simulator safely by PID con
 
 * P (Propotional) : This term make the car steer in propotional to the CTE. Therefore the car keeps heading to the center when everytime it goes far from the center of a lane. However, if the parameter of this is setted too high, the car will repeat approaching to the center and receding from the center very frequently. (i.e., the car is oscillate). On the other hand, for the low value of the parameter, the car will not follow the track when it meets a rapid curve.
 
-* I (Integral) : This term sums up all CTEs until 
+* I (Integral) : This term sums up all CTEs, so that it prevent the car from moving along one side of the lane.
 
-* D (Differential) :
+* D (Derivative) : This term sense how fast CTE change. Therefore the controller gives large steering angle when CTE changes rapidly, but on the contrary the controller gives small steering angle when CTE changes slowly.
 
 ### 2. Parameter Optimization
 
-I used **Twiddle** algorithm for the optimization of parameters of PID controller. The explanation of the algorithm is provided at [here](https://www.youtube.com/watch?v=2uQ2BSzDvXs). In addition, the following is
+I used **Twiddle** algorithm for the optimization of parameters of PID controller. The explanation of the algorithm is provided at [the lecture from Udacity](https://www.youtube.com/watch?v=2uQ2BSzDvXs). The lecture gave me the code of twiddle in python like the following. I built another version of twiddle code in C++ in this project. It can be found in `PID.cpp`.  
 
 ```{.python}
 # Choose an initialization parameter vector
@@ -65,28 +65,10 @@ while sum(dp) > threshold:
 
 ### 3. Adaptive throttle value
 
+In addition to PID contoller for steering angle, I made the throttle value changes in proportional to CTE. The function of throttle value is shown in the below.
+
+#### throttle = -0.08*(CTE ^ 2) + 0.4
+
 ![alt_text][image2]
 
-## Basic Build Instructions
-
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./pid`. 
-
-Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
-
-
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
+Therefore I could reduce maximum CTE compared to the case of constant throttle value. It was confirm by the change of accumulated error during a single lap. (0.394838 -> 0.369452)
