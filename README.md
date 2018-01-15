@@ -1,4 +1,5 @@
-# Writeup for P4 of Self-Driving Car Nanodegree Term2: PID Control
+# Writeup for P4 of Self-Driving Car Nanodegree Term2
+# : PID Control
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
 ### Matt, MinGyu, Kim
